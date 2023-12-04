@@ -108,20 +108,20 @@ param set-default FW_T_SINK_MIN 2.2
 
 param set-default MC_AIRMODE 1
 param set-default MC_ROLLRATE_P 1.15
-param set-default MC_ROLLRATE_I 0.42
-param set-default MC_ROLLRATE_D 0.0
-param set-default MC_ROLLRATE_K 0.8
+param set-default MC_ROLLRATE_I 0.36485
+param set-default MC_ROLLRATE_D 0.00756
+param set-default MC_ROLLRATE_K 1
 param set-default MC_PITCHRATE_P 1.45
-param set-default MC_PITCHRATE_I 0.12
-param set-default MC_PITCHRATE_D 0.0
-param set-default MC_PITCHRATE_K 0.85
+param set-default MC_PITCHRATE_I 0.39096
+param set-default MC_PITCHRATE_D 0.1
+param set-default MC_PITCHRATE_K 1
 param set-default MC_YAWRATE_P 0.45
-param set-default MC_YAWRATE_I 0.2
+param set-default MC_YAWRATE_I 0.21
 param set-default MC_YAWRATE_D 0.2
-param set-default MC_YAWRATE_K 2.1
-param set-default MC_ROLL_P 4.0
-param set-default MC_PITCH_P 2.5
-param set-default MC_YAW_P 3.7
+param set-default MC_YAWRATE_K 1
+param set-default MC_ROLL_P 3.332
+param set-default MC_PITCH_P 3.23
+param set-default MC_YAW_P 4.448
 
 param set-default MIS_TAKEOFF_ALT 10
 

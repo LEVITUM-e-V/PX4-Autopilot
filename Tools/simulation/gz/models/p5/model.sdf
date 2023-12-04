@@ -12,12 +12,12 @@
         <mass>25</mass>
         <inertia> <!-- Inertia characteristics of base_link -->
           <!-- Seems to be right. Check with structure/PD team-->
-          <ixx>0.3673</ixx>
+          <ixx>1.836</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
-          <iyy>0.62322</iyy>
+          <iyy>3.1161</iyy>
           <iyz>0</iyz>
-          <izz>0.9833</izz>
+          <izz>4.9165</izz>
         </inertia>
       </inertial>
       <collision name='base_link_collision'> <!-- Collision geometry for base_link -->
@@ -827,7 +827,7 @@
       <turningDirection>cw</turningDirection>
       <timeConstantUp>0.125</timeConstantUp>
       <timeConstantDown>0.25</timeConstantDown>
-      <maxRotVelocity>1500</maxRotVelocity>
+      <maxRotVelocity>696.281650995</maxRotVelocity>
       <motorConstant>0.00017876</motorConstant>
       <momentConstant>0.06</momentConstant>
       <commandSubTopic>command/motor_speed</commandSubTopic>
@@ -846,7 +846,7 @@
       <turningDirection>ccw</turningDirection>
       <timeConstantUp>0.125</timeConstantUp>
       <timeConstantDown>0.25</timeConstantDown>
-      <maxRotVelocity>1500</maxRotVelocity>
+      <maxRotVelocity>696.281650995</maxRotVelocity>
       <motorConstant>0.00017876</motorConstant>
       <momentConstant>0.06</momentConstant>
       <commandSubTopic>command/motor_speed</commandSubTopic>
@@ -865,7 +865,7 @@
       <turningDirection>ccw</turningDirection>
       <timeConstantUp>0.125</timeConstantUp>
       <timeConstantDown>0.25</timeConstantDown>
-      <maxRotVelocity>1500</maxRotVelocity>
+      <maxRotVelocity>696.281650995</maxRotVelocity>
       <motorConstant>0.00017876</motorConstant>
       <momentConstant>0.06</momentConstant>
       <commandSubTopic>command/motor_speed</commandSubTopic>
@@ -884,7 +884,7 @@
       <turningDirection>cw</turningDirection>
       <timeConstantUp>0.125</timeConstantUp>
       <timeConstantDown>0.25</timeConstantDown>
-      <maxRotVelocity>1500</maxRotVelocity>
+      <maxRotVelocity>696.281650995</maxRotVelocity>
       <motorConstant>0.00017876</motorConstant>
       <momentConstant>0.06</momentConstant>
       <commandSubTopic>command/motor_speed</commandSubTopic>
@@ -903,7 +903,7 @@
       <turningDirection>cw</turningDirection>
       <timeConstantUp>0.125</timeConstantUp>
       <timeConstantDown>0.25</timeConstantDown>
-      <maxRotVelocity>1500</maxRotVelocity>
+      <maxRotVelocity>696.281650995</maxRotVelocity>
       <motorConstant>0.00017876</motorConstant>
       <momentConstant>0.06</momentConstant>
       <commandSubTopic>command/motor_speed</commandSubTopic>
@@ -922,7 +922,7 @@
       <turningDirection>ccw</turningDirection>
       <timeConstantUp>0.125</timeConstantUp>
       <timeConstantDown>0.25</timeConstantDown>
-      <maxRotVelocity>1500</maxRotVelocity>
+      <maxRotVelocity>696.281650995</maxRotVelocity>
       <motorConstant>0.00017876</motorConstant>
       <momentConstant>0.06</momentConstant>
       <commandSubTopic>command/motor_speed</commandSubTopic>
