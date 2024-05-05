@@ -1,0 +1,5 @@
+menuconfig MODULES_LEVITUM
+	bool "levitum"
+	default y
+	---help---
+		Enable support for levitum stuff
