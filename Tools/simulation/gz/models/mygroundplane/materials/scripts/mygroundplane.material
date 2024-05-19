@@ -1,0 +1,13 @@
+material MyGroundPlane/Image
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        texture MyImage.png
+      }
+    }
+  }
+}
