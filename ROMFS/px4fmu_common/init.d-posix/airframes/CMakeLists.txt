@@ -80,6 +80,8 @@ px4_add_romfs_files(
 
 	6011_gazebo-classic_typhoon_h480
 	6011_gazebo-classic_typhoon_h480.post
+	6004_gz_p2
+	6005_gz_p5
 
 	10015_gazebo-classic_iris
 	10016_none_iris
