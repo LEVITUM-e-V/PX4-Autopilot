@@ -7,14 +7,13 @@
 
 . ${R}etc/init.d/rc.vtol_defaults
 
-PX4_
-ULATOR=${PX4_SIMULATOR:=gz}
-PX4_GZ_WORLD=${PX4_GZ_WORLD:=default}
+PX4_SIMULATOR=${PX4_SIMULATOR:=gz}
+PX4_GZ_WORLD=${PX4_GZ_WORLD:=lawn}
 PX4_SIM_MODEL=${PX4_SIM_MODEL:=p5}
 
 param set-default SIM_GZ_EN 1
 param set-default SENS_EN_GPSSIM 1
-param set-default SENS_EN_BAROSIM 0
+param set-default SENS_EN_BAROSIM 1  # enabled barosim
 param set-default SENS_EN_MAGSIM 1
 param set-default SENS_EN_ARSPDSIM 1
 
@@ -73,8 +72,8 @@ param set-default SIM_GZ_SV_FUNC4 204
 
 param set-default SIM_GZ_SV_REV 3
 
-param set-default SIM_GZ_HOME_LAT 48.28035
-param set-default SIM_GZ_HOME_LON 11.71989
+#param set-default SIM_GZ_HOME_LAT 48.28035
+#param set-default SIM_GZ_HOME_LON 11.71989
 
 
 param set-default COM_RC_IN_MODE 1
