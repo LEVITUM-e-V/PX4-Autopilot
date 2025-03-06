@@ -6,7 +6,7 @@
 
 <!-- Base link (Fuselage + Wings) -->
     <link name='base_link'>
-      <pose>0 0 0.17 0 0 0</pose> <!-- Position of P5 Frame relative to inertial frame -->
+      <pose>0 0 0 0 0 0</pose> <!-- Position of P5 Frame relative to inertial frame -->
       <inertial>
         <pose> -0.1 0 0.0277 0 0 0</pose> <!-- Position of inertia tensor relative to base_link frame (center of gravity) -->
         <mass>25</mass>
@@ -755,18 +755,18 @@
     <!-- Canard -->
     <!-- Canard Left-->
     <plugin filename="gz-sim-lift-drag-system" name="gz::sim::systems::LiftDrag">
-      <a0>-0.07</a0>
-      <cla>4.3221</cla>
+      <a0>-0.035</a0>
+      <cla>5.5</cla>
       <cda>0.4181</cda>
-      <cma>0</cma>
-      <alpha_stall>0.209</alpha_stall>
-      <cla_stall>-2.1001</cla_stall>
+      <cma>-0.5</cma>
+      <alpha_stall>0.192</alpha_stall>
+      <cla_stall>-0.95</cla_stall>
       <cda_stall>0.8362</cda_stall>
       <cma_stall>0</cma_stall>
       <cp>0.57 0.28 0</cp>
-      <area>0.07</area>
+      <area>0.2629</area>
       <air_density>1.2</air_density>
-      <forward>1 0 0</forward>
+      <forward>0.999 0 0.0349</forward>
       <upward>0 0 1</upward>
       <link_name>base_link</link_name>
       <control_joint_name>servo_0</control_joint_name>
@@ -779,18 +779,18 @@
     </plugin>
     <!-- Canard Right-->
     <plugin filename="gz-sim-lift-drag-system" name="gz::sim::systems::LiftDrag">
-      <a0>-0.07</a0>
-      <cla>4.3221</cla>
+      <a0>-0.035</a0>
+      <cla>5.5</cla>
       <cda>0.4181</cda>
-      <cma>0</cma>
-      <alpha_stall>0.209</alpha_stall>
-      <cla_stall>-2.1001</cla_stall>
+      <cma>-0.5</cma>
+      <alpha_stall>0.192</alpha_stall>
+      <cla_stall>-0.95</cla_stall>
       <cda_stall>0.8362</cda_stall>
       <cma_stall>0</cma_stall>
       <cp>0.57 -0.28 0</cp>
-      <area>0.07</area>
+      <area>0.2628</area>
       <air_density>1.2</air_density>
-      <forward>1 0 0</forward>
+      <forward>0.999 0 0.0349</forward>
       <upward>0 0 1</upward>
       <link_name>base_link</link_name>
       <control_joint_name>servo_1</control_joint_name>
@@ -804,16 +804,16 @@
     <!-- Main Wing -->
     <!-- Main Wing Left -->
     <plugin filename="gz-sim-lift-drag-system" name="gz::sim::systems::LiftDrag">
-      <a0>-0.0384</a0>
-      <cla>4.0821</cla>
+      <a0>-0.035</a0>
+      <cla>5.1</cla>
       <cda>0.4181</cda>
-      <cma>0</cma>
-      <alpha_stall>0.209</alpha_stall>
-      <cla_stall>-2.1001</cla_stall>
+      <cma>-0.503</cma>
+      <alpha_stall>0.227</alpha_stall>
+      <cla_stall>-0.7</cla_stall>
       <cda_stall>0.8362</cda_stall>
       <cma_stall>0</cma_stall>
       <cp>-0.38 0.5 0</cp>
-      <area>0.16</area>
+      <area>0.6105</area>
       <air_density>1.2</air_density>
       <forward>1 0 0</forward>
       <upward>0 0 1</upward>
@@ -828,16 +828,16 @@
     </plugin>
     <!-- Main Wing Right-->
     <plugin filename="gz-sim-lift-drag-system" name="gz::sim::systems::LiftDrag">
-      <a0>-0.0384</a0>
-      <cla>4.0821</cla>
+      <a0>-0.035</a0>
+      <cla>5.1</cla>
       <cda>0.4181</cda>
-      <cma>0</cma>
-      <alpha_stall>0.209</alpha_stall>
-      <cla_stall>-2.1001</cla_stall>
+      <cma>-0.503</cma>
+      <alpha_stall>0.227</alpha_stall>
+      <cla_stall>-0.7</cla_stall>
       <cda_stall>0.8362</cda_stall>
       <cma_stall>0</cma_stall>
       <cp>-0.38 -0.5 0</cp>
-      <area>0.16</area>
+      <area>0.6105</area>
       <air_density>1.2</air_density>
       <forward>1 0 0</forward>
       <upward>0 0 1</upward>
