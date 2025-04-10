@@ -79,6 +79,7 @@ if(CONFIG_MODULES_MC_RATE_CONTROL)
 		6001_hexa_x
 		6002_draco_r
 
+
 		# [7000, 7999] Hexarotor +
 		7001_hexa_+
 
@@ -128,6 +129,7 @@ if(CONFIG_MODULES_VTOL_ATT_CONTROL)
 	px4_add_romfs_files(
 		# [13000, 13999] VTOL
 		13000_generic_vtol_standard
+		13005_levitum_p5
 		13100_generic_vtol_tiltrotor
 		13013_deltaquad
 		13014_vtol_babyshark
