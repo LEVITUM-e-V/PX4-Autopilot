@@ -72,8 +72,8 @@ param set-default SIM_GZ_SV_FUNC4 204
 
 param set-default SIM_GZ_SV_REV 3
 
-#param set-default SIM_GZ_HOME_LAT 48.28035
-#param set-default SIM_GZ_HOME_LON 11.71989
+param set-default SIM_GZ_HOME_LAT 48.28035
+param set-default SIM_GZ_HOME_LON 11.71989
 
 
 param set-default COM_RC_IN_MODE 1
@@ -135,9 +135,11 @@ param set-default MPC_Z_VEL_P_ACC 8.0
 param set-default NAV_ACC_RAD 5
 
 param set-default VT_FWD_THRUST_EN 4
-# param set-default VT_F_TRANS_THR 0.75
+param set-default VT_F_TRANS_THR 0.75
 param set-default VT_ARSP_TRANS 15
 param set-default VT_F_TRANS_DUR 20
 param set-default VT_B_TRANS_DUR 30
 param set-default VT_TYPE 2
 param set-default FD_ESCS_EN 0
+
+#param load /home/cl/PX4-Autopilot/ROMFS/px4fmu_common/init.d/p5.param
