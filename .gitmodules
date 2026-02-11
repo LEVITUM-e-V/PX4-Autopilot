@@ -83,3 +83,5 @@
 	path = Tools/simulation/gz
 	url = https://github.com/LEVITUM-e-V/PX4-gazebo-models.git
 	branch = levitum
+[submodule "gz"]
+	branch = levitum
