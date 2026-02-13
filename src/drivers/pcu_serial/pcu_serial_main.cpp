@@ -31,15 +31,15 @@
  *
  ****************************************************************************/
 
-#include "FuelCellSerial.hpp"
+#include "PcuSerial.hpp"
 
 #include <px4_platform_common/getopt.h>
 #include <px4_platform_common/module.h>
 
-namespace fuelcell_serial
+namespace pcu_serial
 {
 
-FuelCellSerial *g_dev{nullptr};
+PcuSerial *g_dev{nullptr};
 
 static int start(const char *port)
 {
@@ -53,7 +53,7 @@ static int start(const char *port)
 		return -1;
 	}
 
-	g_dev = new FuelCellSerial(port);
+	g_dev = new PcuSerial(port);
 
 	if (g_dev == nullptr) {
 		return -1;
@@ -99,25 +99,25 @@ static int usage()
 		R"DESCR_STR(
 ### Description
 
-Serial driver for reading fuel cell telemetry data over UART.
+Serial driver for reading PCU (Power Control Unit) telemetry data over UART.
 
 Expects ASCII comma-separated float values, newline-terminated.
 Publishes data to the debug_array uORB topic, which is bridged to
 the ground station via MAVLink DEBUG_FLOAT_ARRAY messages.
 
-The serial port is configured via the FCEL_SER_CFG parameter.
+The serial port is configured via the PCU_UART_PORT parameter.
 
 ### Examples
 
 Start driver on a specified serial device:
-$ fuelcell_serial start -d /dev/ttyS3
+$ pcu_serial start -d /dev/ttyS3
 
 Stop driver:
-$ fuelcell_serial stop
+$ pcu_serial stop
 )DESCR_STR");
 
-	PRINT_MODULE_USAGE_NAME("fuelcell_serial", "driver");
-	PRINT_MODULE_USAGE_SUBCATEGORY("fuelcell");
+	PRINT_MODULE_USAGE_NAME("pcu_serial", "driver");
+	PRINT_MODULE_USAGE_SUBCATEGORY("pcu");
 	PRINT_MODULE_USAGE_COMMAND_DESCR("start", "Start driver");
 	PRINT_MODULE_USAGE_PARAM_STRING('d', nullptr, nullptr, "Serial device", false);
 	PRINT_MODULE_USAGE_COMMAND_DESCR("stop", "Stop driver");
@@ -125,9 +125,9 @@ $ fuelcell_serial stop
 	return PX4_OK;
 }
 
-} // namespace fuelcell_serial
+} // namespace pcu_serial
 
-extern "C" __EXPORT int fuelcell_serial_main(int argc, char *argv[])
+extern "C" __EXPORT int pcu_serial_main(int argc, char *argv[])
 {
 	const char *device_path = nullptr;
 	int ch;
@@ -141,26 +141,26 @@ extern "C" __EXPORT int fuelcell_serial_main(int argc, char *argv[])
 			break;
 
 		default:
-			fuelcell_serial::usage();
+			pcu_serial::usage();
 			return -1;
 		}
 	}
 
 	if (myoptind >= argc) {
-		fuelcell_serial::usage();
+		pcu_serial::usage();
 		return -1;
 	}
 
 	if (!strcmp(argv[myoptind], "start")) {
-		return fuelcell_serial::start(device_path);
+		return pcu_serial::start(device_path);
 
 	} else if (!strcmp(argv[myoptind], "stop")) {
-		return fuelcell_serial::stop();
+		return pcu_serial::stop();
 
 	} else if (!strcmp(argv[myoptind], "status")) {
-		return fuelcell_serial::status();
+		return pcu_serial::status();
 	}
 
-	fuelcell_serial::usage();
+	pcu_serial::usage();
 	return -1;
 }

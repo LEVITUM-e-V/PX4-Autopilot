@@ -1,0 +1,7 @@
+module_name: PCU Serial
+serial_config:
+    - command: pcu_serial start -d ${SERIAL_DEV}
+      port_config_param:
+        name: PCU_UART_PORT
+        group: Sensors
+        default: EXT2

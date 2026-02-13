@@ -31,12 +31,12 @@
 #
 ############################################################################
 px4_add_module(
-	MODULE drivers__fuelcell_serial
-	MAIN fuelcell_serial
+	MODULE drivers__pcu_serial
+	MAIN pcu_serial
 	SRCS
-		FuelCellSerial.cpp
-		FuelCellSerial.hpp
-		fuelcell_serial_main.cpp
+		PcuSerial.cpp
+		PcuSerial.hpp
+		pcu_serial_main.cpp
 	DEPENDS
 		px4_work_queue
 	MODULE_CONFIG

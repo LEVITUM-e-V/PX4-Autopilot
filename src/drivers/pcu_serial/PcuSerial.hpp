@@ -32,9 +32,9 @@
  ****************************************************************************/
 
 /**
- * @file FuelCellSerial.hpp
+ * @file PcuSerial.hpp
  *
- * Driver for reading fuel cell telemetry over serial (UART).
+ * Driver for reading PCU (Power Control Unit) telemetry over serial (UART).
  * Expects ASCII comma-separated float values, newline-terminated.
  * Publishes to the debug_array uORB topic.
  */
@@ -48,11 +48,11 @@
 #include <uORB/Publication.hpp>
 #include <uORB/topics/debug_array.h>
 
-class FuelCellSerial : public px4::ScheduledWorkItem
+class PcuSerial : public px4::ScheduledWorkItem
 {
 public:
-	FuelCellSerial(const char *port);
-	~FuelCellSerial() override;
+	PcuSerial(const char *port);
+	~PcuSerial() override;
 
 	int			init();
 	void			print_info();

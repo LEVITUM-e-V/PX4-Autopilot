@@ -31,14 +31,14 @@
  *
  ****************************************************************************/
 
-#include "FuelCellSerial.hpp"
+#include "PcuSerial.hpp"
 
 #include <fcntl.h>
 #include <termios.h>
 #include <cstring>
 #include <cstdlib>
 
-FuelCellSerial::FuelCellSerial(const char *port) :
+PcuSerial::PcuSerial(const char *port) :
 	ScheduledWorkItem(MODULE_NAME, px4::serial_port_to_wq(port)),
 	_sample_perf(perf_alloc(PC_ELAPSED, MODULE_NAME": read")),
 	_comms_errors(perf_alloc(PC_COUNT, MODULE_NAME": com_err"))
@@ -47,7 +47,7 @@ FuelCellSerial::FuelCellSerial(const char *port) :
 	_port[sizeof(_port) - 1] = '\0';
 }
 
-FuelCellSerial::~FuelCellSerial()
+PcuSerial::~PcuSerial()
 {
 	stop();
 
@@ -59,13 +59,13 @@ FuelCellSerial::~FuelCellSerial()
 	perf_free(_comms_errors);
 }
 
-int FuelCellSerial::init()
+int PcuSerial::init()
 {
 	start();
 	return PX4_OK;
 }
 
-int FuelCellSerial::open_serial_port()
+int PcuSerial::open_serial_port()
 {
 	_fd = ::open(_port, O_RDWR | O_NOCTTY | O_NONBLOCK);
 
@@ -102,7 +102,7 @@ int FuelCellSerial::open_serial_port()
 	return PX4_OK;
 }
 
-int FuelCellSerial::parse_floats(const char *line, debug_array_s &msg)
+int PcuSerial::parse_floats(const char *line, debug_array_s &msg)
 {
 	unsigned count = 0;
 	const char *ptr = line;
@@ -130,7 +130,7 @@ int FuelCellSerial::parse_floats(const char *line, debug_array_s &msg)
 	return (int)count;
 }
 
-int FuelCellSerial::collect()
+int PcuSerial::collect()
 {
 	char readbuf[128];
 	int ret = ::read(_fd, readbuf, sizeof(readbuf));
@@ -155,7 +155,7 @@ int FuelCellSerial::collect()
 				debug_array_s msg{};
 				msg.timestamp = hrt_absolute_time();
 				msg.id = 0;
-				strncpy(msg.name, "fuelcell", sizeof(msg.name));
+				strncpy(msg.name, "pcu", sizeof(msg.name));
 
 				int num_values = parse_floats(_linebuf, msg);
 
@@ -183,17 +183,17 @@ int FuelCellSerial::collect()
 	return PX4_OK;
 }
 
-void FuelCellSerial::start()
+void PcuSerial::start()
 {
 	ScheduleOnInterval(10000); /* 100 Hz */
 }
 
-void FuelCellSerial::stop()
+void PcuSerial::stop()
 {
 	ScheduleClear();
 }
 
-void FuelCellSerial::Run()
+void PcuSerial::Run()
 {
 	if (_fd < 0) {
 		if (open_serial_port() != PX4_OK) {
@@ -204,7 +204,7 @@ void FuelCellSerial::Run()
 	collect();
 }
 
-void FuelCellSerial::print_info()
+void PcuSerial::print_info()
 {
 	perf_print_counter(_sample_perf);
 	perf_print_counter(_comms_errors);
