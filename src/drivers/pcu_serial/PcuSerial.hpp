@@ -35,8 +35,13 @@
  * @file PcuSerial.hpp
  *
  * Driver for reading PCU (Power Control Unit) telemetry over serial (UART).
- * Expects ASCII comma-separated float values, newline-terminated.
- * Publishes to the debug_array uORB topic.
+ * The PCU sends CSV lines in the format:
+ *   FC:<stack_voltage>,<load_current>,<power>,<energy>,<battery_voltage>,
+ *      <battery_current>,<load_voltage>,<stack_temp_1>,<stack_temp_2>,
+ *      <stack_temp_3>,<stack_temp_4>,<target_stack_temp>,<board_temp>,
+ *      <h2_supply_pressure>,<tank_pressure>,<fan_speed>,<operation_state>\r\n
+ *
+ * Publishes to the pcu_telemetry uORB topic.
  */
 
 #pragma once
@@ -46,7 +51,7 @@
 #include <drivers/drv_hrt.h>
 #include <lib/perf/perf_counter.h>
 #include <uORB/Publication.hpp>
-#include <uORB/topics/debug_array.h>
+#include <uORB/topics/pcu_telemetry.h>
 
 class PcuSerial : public px4::ScheduledWorkItem
 {
@@ -64,16 +69,22 @@ private:
 
 	int			open_serial_port();
 	int			collect();
-	int			parse_floats(const char *line, debug_array_s &msg);
+
+	/** Maximum expected CSV line length (including "FC:" prefix and \r\n) */
+	static constexpr unsigned LINE_BUF_SIZE = 512;
+
+	/** Number of CSV fields expected (16 floats + 1 uint) */
+	static constexpr unsigned NUM_FIELDS = 17;
+
+	char			_line_buf[LINE_BUF_SIZE] {};
+	unsigned		_line_pos{0};
+
+	void			parse_line();
 
 	char			_port[20] {};
 	int			_fd{-1};
 
-	static constexpr unsigned LINE_BUFFER_SIZE = 1024;
-	char			_linebuf[LINE_BUFFER_SIZE] {};
-	unsigned		_linebuf_index{0};
-
-	uORB::Publication<debug_array_s> _debug_array_pub{ORB_ID(debug_array)};
+	uORB::Publication<pcu_telemetry_s> _pcu_telemetry_pub{ORB_ID(pcu_telemetry)};
 
 	perf_counter_t		_sample_perf;
 	perf_counter_t		_comms_errors;

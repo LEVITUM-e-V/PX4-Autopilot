@@ -1,25 +1,84 @@
 # PCU Serial Driver
 
-The `pcu_serial` driver reads telemetry data from the Power Control Unit (PCU) over a serial UART connection. It expects ASCII comma-separated float values, newline-terminated, and publishes them to the `debug_array` uORB topic. On the ground station side, these appear as `DEBUG_FLOAT_ARRAY` MAVLink messages.
+The `pcu_serial` driver reads telemetry data from the Power Control Unit (PCU) over a serial UART connection. It expects CSV lines with the prefix `FC:`, terminated by `\r\n`, and publishes them to the `pcu_telemetry` uORB topic. A custom MAVLink stream (`PCU_TELEMETRY`, message ID 50001) forwards this data to the ground station.
 
 ## Data Format
 
-The PCU sends 10 comma-separated values per line at 115200 baud:
+The PCU sends CSV lines at 115200 baud in the following format:
 
-| Index | Field              | Unit   |
-|-------|--------------------|--------|
-| 0     | Stack voltage      | V      |
-| 1     | Stack current      | A      |
-| 2     | Stack power        | W      |
-| 3     | Stack temperature  | C      |
-| 4     | State of charge    | %      |
-| 5     | H2 pressure        | bar*10 |
-| 6     | Coolant temperature| C      |
-| 7     | System state       | -      |
-| 8     | Fault code         | -      |
-| 9     | Cell voltage min   | V      |
+```
+FC:<stack_voltage>,<load_current>,<power>,<energy>,<battery_voltage>,<battery_current>,<load_voltage>,<stack_temp_1>,<stack_temp_2>,<stack_temp_3>,<stack_temp_4>,<target_stack_temp>,<board_temp>,<h2_supply_pressure>,<tank_pressure>,<fan_speed>,<operation_state>\r\n
+```
 
-System state values: `1` = running, `2` = warmup, `3` = fault.
+| Index | Field              | Type   | Unit   |
+|-------|--------------------|--------|--------|
+| 0     | Stack voltage      | float  | V      |
+| 1     | Load current       | float  | A      |
+| 2     | Power              | float  | W      |
+| 3     | Energy             | float  | Wh     |
+| 4     | Battery voltage    | float  | V      |
+| 5     | Battery current    | float  | A      |
+| 6     | Load voltage       | float  | V      |
+| 7     | Stack temp 1       | float  | deg C  |
+| 8     | Stack temp 2       | float  | deg C  |
+| 9     | Stack temp 3       | float  | deg C  |
+| 10    | Stack temp 4       | float  | deg C  |
+| 11    | Target stack temp  | float  | deg C  |
+| 12    | Board temp         | float  | deg C  |
+| 13    | H2 supply pressure | float  | mV     |
+| 14    | Tank pressure      | float  | -      |
+| 15    | Fan speed          | float  | %      |
+| 16    | Operation state    | uint   | -      |
+
+Operation state values: `0` = standby, `1` = warmup, `2` = running, `3` = fault.
+
+## uORB Topic: `pcu_telemetry`
+
+The driver publishes to the `pcu_telemetry` uORB topic, defined in `msg/PcuTelemetry.msg`. The CSV field order matches the field order in the message definition. The message must be registered in `msg/CMakeLists.txt` to be built.
+
+To inspect the topic at runtime from the PX4 shell:
+
+```
+listener pcu_telemetry
+```
+
+## MAVLink Stream: `PCU_TELEMETRY`
+
+A custom MAVLink message `PCU_TELEMETRY` (message ID **50001**) is defined in the Levitum MAVLink dialect (`src/modules/mavlink/mavlink/message_definitions/v1.0/development.xml`). It carries all 16 float fields plus the `operation_state` uint8 and a `time_usec` timestamp.
+
+The MAVLink stream class is implemented in `src/modules/mavlink/streams/PCU_TELEMETRY.hpp`. It subscribes to the `pcu_telemetry` uORB topic and sends a `PCU_TELEMETRY` MAVLink message whenever new data is available.
+
+### How It Works
+
+1. The `pcu_serial` driver parses CSV lines from the UART and publishes a `pcu_telemetry` uORB message.
+2. The MAVLink module's `PCU_TELEMETRY` stream subscribes to this uORB topic.
+3. Each update is forwarded as a `PCU_TELEMETRY` MAVLink message to the GCS.
+
+### Default Stream Rates
+
+The `PCU_TELEMETRY` stream is configured in `src/modules/mavlink/mavlink_main.cpp` at the following default rates:
+
+| MAVLink Mode   | Default Rate |
+|----------------|-------------|
+| Normal         | 1 Hz        |
+| Onboard        | 10 Hz       |
+| OSD            | 1 Hz        |
+| Config (USB)   | 50 Hz       |
+| Minimal        | 1 Hz        |
+
+### Adjusting the Stream Rate
+
+To change the rate at runtime from the PX4 shell:
+
+```
+mavlink stream -d /dev/ttyS6 -s PCU_TELEMETRY -r 10
+```
+
+Replace `/dev/ttyS6` with the MAVLink port device (e.g., TELEM1 on Pixhawk 6X), or use `-u 14550` for a UDP connection. Set `-r 0` to disable the stream.
+
+### Receiving on the Ground Station
+
+The GCS must support the custom `PCU_TELEMETRY` message (ID 50001). For custom GCS integrations, use the Levitum MAVLink dialect XML to generate the appropriate language bindings. In QGroundControl, custom messages can be viewed in the MAVLink Inspector.
 
 ## Configuration
 
@@ -66,46 +125,6 @@ For the PCU, the default is **EXT2** which maps to `/dev/ttyS3`.
 
 To check the mapping on any other board, look at the `CONFIG_BOARD_SERIAL_*` entries in its `.px4board` file under `boards/px4/<board>/`.
 
-## MAVLink Telemetry Output
-
-The driver publishes PCU data to the `debug_array` uORB topic with the name field set to `"pcu"`. PX4's MAVLink module automatically bridges this to the ground station as a `DEBUG_FLOAT_ARRAY` MAVLink message (MAVLink 2 common message set).
-
-### How It Works
-
-1. `pcu_serial` driver parses the serial data and publishes a `debug_array` uORB message
-2. The MAVLink module subscribes to `debug_array` via its `DEBUG_FLOAT_ARRAY` stream
-3. Each update is forwarded as a `DEBUG_FLOAT_ARRAY` MAVLink message to the GCS
-
-The MAVLink message contains:
-- `time_usec` — timestamp from the uORB message
-- `array_id` — set to `0`
-- `name` — `"pcu"` (use this to identify PCU data on the GCS side)
-- `data[0..9]` — the 10 float values from the data format table above
-
-### Default Stream Rates
-
-The `DEBUG_FLOAT_ARRAY` stream is enabled by default in most MAVLink modes:
-
-| MAVLink Mode | Default Rate |
-|--------------|-------------|
-| Normal       | 1 Hz        |
-| Onboard      | 10 Hz       |
-| Config (USB) | 50 Hz       |
-
-### Adjusting the Stream Rate
-
-To change the rate at runtime from the PX4 shell:
-
-```
-mavlink stream -d /dev/ttyS6 -s DEBUG_FLOAT_ARRAY -r 10
-```
-
-Replace `/dev/ttyS6` with the MAVLink port device (e.g., TELEM1 on Pixhawk 6X), or use `-u 14550` for a UDP connection. Set `-r 0` to disable the stream.
-
-### Receiving on the Ground Station
-
-In QGroundControl, `DEBUG_FLOAT_ARRAY` messages are logged in the MAVLink Inspector. For custom GCS integrations, filter for `DEBUG_FLOAT_ARRAY` messages where `name == "pcu"`.
-
 ## Manual Start
 
 The driver can also be started manually from the PX4 shell, bypassing the parameter system:
@@ -118,7 +137,7 @@ pcu_serial stop
 
 ## PCU Simulator (SITL Testing)
 
-For testing without hardware, `Tools/simulation/pcu_sim.py` creates a pseudo-terminal and sends simulated PCU telemetry.
+For testing without hardware, `Tools/simulation/pcu_sim.py` creates a pseudo-terminal and sends simulated PCU CSV telemetry.
 
 ### Usage
 
@@ -131,10 +150,11 @@ python3 Tools/simulation/pcu_sim.py
 Output:
 
 ```
-PCU simulator started
+PCU simulator started (CSV mode)
   PTY path : /dev/pts/5
   Profile  : steady
   Rate     : 10.0 Hz
+  Format   : FC:<16 floats>,<uint>\r\n
 
 Start the driver with:
   pcu_serial start -d /dev/pts/5
