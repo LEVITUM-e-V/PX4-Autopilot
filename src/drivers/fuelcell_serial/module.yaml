@@ -1,0 +1,6 @@
+module_name: Fuel Cell Serial
+serial_config:
+    - command: fuelcell_serial start -d ${SERIAL_DEV}
+      port_config_param:
+        name: FCEL_SER_CFG
+        group: Sensors

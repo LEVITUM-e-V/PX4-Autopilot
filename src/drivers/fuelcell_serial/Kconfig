@@ -1,0 +1,5 @@
+menuconfig DRIVERS_FUELCELL_SERIAL
+	bool "fuelcell_serial"
+	default n
+	---help---
+		Enable support for fuel cell serial telemetry driver
