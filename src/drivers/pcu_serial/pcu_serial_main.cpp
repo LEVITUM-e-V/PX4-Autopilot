@@ -101,9 +101,9 @@ static int usage()
 
 Serial driver for reading PCU (Power Control Unit) telemetry data over UART.
 
-Expects ASCII comma-separated float values, newline-terminated.
-Publishes data to the debug_array uORB topic, which is bridged to
-the ground station via MAVLink DEBUG_FLOAT_ARRAY messages.
+Expects CSV lines prefixed with "FC:" containing 16 float values and 1 uint,
+newline-terminated. Publishes data to the pcu_telemetry uORB topic, which is
+bridged to the ground station via MAVLink PCU_TELEMETRY messages.
 
 The serial port is configured via the PCU_UART_PORT parameter.
 
