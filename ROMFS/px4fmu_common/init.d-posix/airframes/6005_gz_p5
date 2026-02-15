@@ -142,4 +142,3 @@ param set-default VT_B_TRANS_DUR 30
 param set-default VT_TYPE 2
 param set-default FD_ESCS_EN 0
 
-#param load /home/cl/PX4-Autopilot/ROMFS/px4fmu_common/init.d/p5.param
