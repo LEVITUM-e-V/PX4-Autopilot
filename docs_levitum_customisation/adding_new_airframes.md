@@ -1,6 +1,6 @@
 # Adding New Airframes for Gazebo SITL Simulation
 
-This guide documents the steps required to add a new airframe to the PX4 SITL (Software-In-The-Loop) simulation using Gazebo.
+This guide documents the steps required to add a new model to the PX4 SITL (Software-In-The-Loop) simulation using Gazebo.
 
 ## Overview
 

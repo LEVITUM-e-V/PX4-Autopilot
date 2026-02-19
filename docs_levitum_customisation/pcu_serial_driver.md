@@ -44,7 +44,17 @@ listener pcu_telemetry
 
 ## MAVLink Stream: `PCU_TELEMETRY`
 
-A custom MAVLink message `PCU_TELEMETRY` (message ID **50001**) is defined in the Levitum MAVLink dialect (`src/modules/mavlink/mavlink/message_definitions/v1.0/levitum.xml`). It carries all 16 float fields plus the `operation_state` uint8 and a `time_usec` timestamp.
+A custom MAVLink message `PCU_TELEMETRY` (message ID **50001**) is defined in the LEVITUM MAVLink dialect (`src/modules/mavlink/mavlink/message_definitions/v1.0/levitum.xml`). It carries all 16 float fields plus the `operation_state` uint8 and a `time_usec` timestamp.
+
+The `mavlink` submodule at `src/modules/mavlink/mavlink` points to the LEVITUM fork at [LEVITUM-e-V/mavlink](https://github.com/LEVITUM-e-V/mavlink), where the custom message definition lives. Any changes to the MAVLink message definition must be made in that fork and the submodule updated afterwards:
+
+```bash
+cd PX4-Autopilot
+git submodule update --remote src/modules/mavlink/mavlink
+git add src/modules/mavlink/mavlink
+git commit -m "Update mavlink submodule"
+git push
+```
 
 The MAVLink stream class is implemented in `src/modules/mavlink/streams/PCU_TELEMETRY.hpp`. It subscribes to the `pcu_telemetry` uORB topic and sends a `PCU_TELEMETRY` MAVLink message whenever new data is available.
 
