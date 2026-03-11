@@ -112,7 +112,7 @@ void PcuSerial::parse_line()
 
 	/* Verify "FC:" prefix */
 	if (strncmp(_line_buf, "FC:", 3) != 0) {
-		PX4_DEBUG("line missing FC: prefix");
+		PX4_WARN("line missing FC: prefix");
 		perf_count(_comms_errors);
 		return;
 	}
@@ -130,7 +130,7 @@ void PcuSerial::parse_line()
 		fields[i] = strtof(ptr, &end);
 
 		if (end == ptr) {
-			PX4_DEBUG("CSV parse error at field %u", i);
+			PX4_WARN("CSV parse error at field %u", i);
 			perf_count(_comms_errors);
 			perf_end(_sample_perf);
 			return;
@@ -141,7 +141,7 @@ void PcuSerial::parse_line()
 		if (i < NUM_FIELDS - 2) {
 			/* Expect a comma separator between fields */
 			if (*ptr != ',') {
-				PX4_DEBUG("expected comma after field %u, got '%c'", i, *ptr);
+				PX4_WARN("expected comma after field %u, got '%c'", i, *ptr);
 				perf_count(_comms_errors);
 				perf_end(_sample_perf);
 				return;
@@ -153,7 +153,7 @@ void PcuSerial::parse_line()
 
 	/* Expect comma before the last (uint) field */
 	if (*ptr != ',') {
-		PX4_DEBUG("expected comma before operation_state, got '%c'", *ptr);
+		PX4_WARN("expected comma before operation_state, got '%c'", *ptr);
 		perf_count(_comms_errors);
 		perf_end(_sample_perf);
 		return;
@@ -165,7 +165,7 @@ void PcuSerial::parse_line()
 	unsigned long val = strtoul(ptr, &end, 10);
 
 	if (end == ptr) {
-		PX4_DEBUG("CSV parse error at operation_state");
+		PX4_WARN("CSV parse error at operation_state");
 		perf_count(_comms_errors);
 		perf_end(_sample_perf);
 		return;
@@ -240,7 +240,7 @@ int PcuSerial::collect()
 
 			} else {
 				/* Line too long, discard and reset */
-				PX4_DEBUG("line buffer overflow, discarding");
+				PX4_WARN("line buffer overflow, discarding");
 				_line_pos = 0;
 			}
 		}
