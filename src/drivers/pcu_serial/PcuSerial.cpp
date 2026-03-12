@@ -130,7 +130,7 @@ void PcuSerial::parse_line()
 		fields[i] = strtof(ptr, &end);
 
 		if (end == ptr) {
-			PX4_WARN("CSV parse error at field %u", i);
+			PX4_WARN("CSV parse error at field %u, got '%c'", i, *ptr);
 			perf_count(_comms_errors);
 			perf_end(_sample_perf);
 			return;
@@ -165,7 +165,7 @@ void PcuSerial::parse_line()
 	unsigned long val = strtoul(ptr, &end, 10);
 
 	if (end == ptr) {
-		PX4_WARN("CSV parse error at operation_state");
+		PX4_WARN("CSV parse error at operation_state, got '%c'", *ptr);
 		perf_count(_comms_errors);
 		perf_end(_sample_perf);
 		return;
