@@ -390,3 +390,15 @@ PARAM_DEFINE_INT32(UAVCAN_SUB_RNG, 0);
  * @group UAVCAN
  */
 PARAM_DEFINE_INT32(UAVCAN_SUB_BTN, 0);
+
+/**
+ * subscription PCU
+ *
+ * Enable UAVCAN PCU (hydrogen fuel cell) subscription.
+ *  levitum::equipment::pcu::PcuStatus
+ *
+ * @boolean
+ * @reboot_required true
+ * @group UAVCAN
+ */
+PARAM_DEFINE_INT32(UAVCAN_SUB_PCU, 0);

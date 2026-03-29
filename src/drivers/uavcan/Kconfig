@@ -82,6 +82,10 @@ if DRIVERS_UAVCAN
         bool "Subscribe to Safety Button:               ardupilot::indication::Button"
         default y
 
+    config UAVCAN_SENSOR_PCU
+        bool "Subscribe to PCU:                         levitum::equipment::pcu::PcuStatus"
+        default y
+
 endif #DRIVERS_UAVCAN
 
 
