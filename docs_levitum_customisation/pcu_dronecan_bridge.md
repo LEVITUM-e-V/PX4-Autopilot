@@ -107,7 +107,7 @@ The PCU node ID (125) is hardcoded in the PCU firmware (`PCU/Core/Inc/pcu_dronec
 |------|---------|
 | `src/drivers/uavcan/sensors/pcu.hpp` | Bridge class definition |
 | `src/drivers/uavcan/sensors/pcu.cpp` | Subscriber callback, field mapping, uORB publish |
-| `src/drivers/uavcan/dsdl/levitum/equipment/pcu/20200.PcuStatus.uavcan` | DSDL message definition |
+| `src/drivers/uavcan/dsdl/levitum/equipment/pcu/20201.PcuStatus.uavcan` | DSDL message definition |
 
 ### Modified Files
 
