@@ -1,4 +1,16 @@
-# PX4 Drone Autopilot
+# PX4 Drone Autopilot (LEVITUM Fork)
+
+This is a fork of [PX4/PX4-Autopilot](https://github.com/PX4/PX4-Autopilot) maintained by LEVITUM. It contains our custom airframe configurations, mixer files, and simulation setups for the LEVITUM prototypes.
+
+LEVITUM-specific documentation and guides can be found in the [`docs_levitum_customisation/`](docs_levitum_customisation/) directory.
+
+---
+
+## Upstream README
+
+*The following is the original upstream documentation.*
+
+# PX4 Drone Autopilot (Upstream)
 
 [![Releases](https://img.shields.io/github/release/PX4/PX4-Autopilot.svg)](https://github.com/PX4/PX4-Autopilot/releases) [![DOI](https://zenodo.org/badge/22634/PX4/PX4-Autopilot.svg)](https://zenodo.org/badge/latestdoi/22634/PX4/PX4-Autopilot)
 

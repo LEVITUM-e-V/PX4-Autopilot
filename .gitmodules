@@ -1,7 +1,7 @@
 [submodule "src/modules/mavlink/mavlink"]
 	path = src/modules/mavlink/mavlink
-	url = https://github.com/mavlink/mavlink.git
-	branch = master
+	url = https://github.com/LEVITUM-e-V/mavlink.git
+	branch = levitum_mavlink
 [submodule "src/drivers/uavcan/libuavcan"]
 	path = src/drivers/uavcan/libuavcan
 	url = https://github.com/dronecan/libuavcan.git
@@ -82,6 +82,4 @@
 [submodule "Tools/simulation/gz"]
 	path = Tools/simulation/gz
 	url = https://github.com/LEVITUM-e-V/PX4-gazebo-models.git
-	branch = levitum
-[submodule "gz"]
 	branch = levitum

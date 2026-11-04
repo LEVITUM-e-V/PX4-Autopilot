@@ -105,5 +105,6 @@ px4_add_romfs_files(
 
 	# [22000, 22999] Reserve for custom models
 	6004_gz_p2
-	6005_gz_p5	
+	6005_gz_p5
+	6006_gz_p4_1
 )

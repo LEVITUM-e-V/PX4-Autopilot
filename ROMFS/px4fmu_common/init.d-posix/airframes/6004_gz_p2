@@ -136,7 +136,7 @@ param set-default MPC_Z_VEL_P_ACC 8.0
 param set-default NAV_ACC_RAD 5
 
 param set-default VT_FWD_THRUST_EN 4
-# param set-default VT_F_TRANS_THR 0.75
+param set-default VT_F_TRANS_THR 0.75
 param set-default VT_ARSP_TRANS 15
 param set-default VT_F_TRANS_DUR 20
 param set-default VT_B_TRANS_DUR 30

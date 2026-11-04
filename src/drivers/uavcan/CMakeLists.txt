@@ -108,6 +108,7 @@ set(DSDLC_INPUTS
 	"${LIBUAVCAN_DIR}/dsdl/com"
 	"${LIBUAVCAN_DIR}/dsdl/cuav"
 	"${LIBUAVCAN_DIR}/dsdl/dronecan"
+	"${DSDLC_DIR}/levitum"
 	"${LIBUAVCAN_DIR}/dsdl/uavcan"
 )
 set(DSDLC_OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/include/dsdlc_generated")
@@ -177,6 +178,7 @@ px4_add_module(
 		sensors/ice_status.cpp
 		sensors/hygrometer.cpp
 		sensors/safety_button.cpp
+		sensors/pcu.cpp
 	MODULE_CONFIG
 		module.yaml
 	DEPENDS

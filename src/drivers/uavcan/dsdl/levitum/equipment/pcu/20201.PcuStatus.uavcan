@@ -1,0 +1,29 @@
+#
+# Hydrogen fuel cell Power Control Unit telemetry.
+# Sent at up to 10 Hz by the PCU DroneCAN node.
+# Fields are grouped by subsystem; future sensors are appended at the end.
+#
+
+# --- Fuel cell stack ---
+float16 stack_voltage           # [V]
+float16 load_current            # [A]
+float16 power                   # [W]
+float32 energy                  # [Wh] float32 for accumulated value range
+float16 battery_voltage         # [V]
+float16 battery_current         # [A]
+float16 load_voltage            # [V]
+
+# --- Temperatures ---
+float16[4] stack_temp           # [deg C] indices 0-3
+float16 target_stack_temp       # [deg C]
+float16 board_temp              # [deg C]
+
+# --- Pressures ---
+float16 h2_supply_pressure      # [bar]
+float16 tank_pressure           # [bar]
+
+# --- Actuators ---
+float16 fan_speed               # [RPM]
+
+# --- State ---
+uint8 operation_state           # enum from fuel cell controller

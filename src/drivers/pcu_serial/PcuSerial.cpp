@@ -31,14 +31,14 @@
  *
  ****************************************************************************/
 
-#include "FuelCellSerial.hpp"
+#include "PcuSerial.hpp"
 
 #include <fcntl.h>
 #include <termios.h>
 #include <cstring>
 #include <cstdlib>
 
-FuelCellSerial::FuelCellSerial(const char *port) :
+PcuSerial::PcuSerial(const char *port) :
 	ScheduledWorkItem(MODULE_NAME, px4::serial_port_to_wq(port)),
 	_sample_perf(perf_alloc(PC_ELAPSED, MODULE_NAME": read")),
 	_comms_errors(perf_alloc(PC_COUNT, MODULE_NAME": com_err"))
@@ -47,7 +47,7 @@ FuelCellSerial::FuelCellSerial(const char *port) :
 	_port[sizeof(_port) - 1] = '\0';
 }
 
-FuelCellSerial::~FuelCellSerial()
+PcuSerial::~PcuSerial()
 {
 	stop();
 
@@ -59,13 +59,13 @@ FuelCellSerial::~FuelCellSerial()
 	perf_free(_comms_errors);
 }
 
-int FuelCellSerial::init()
+int PcuSerial::init()
 {
 	start();
 	return PX4_OK;
 }
 
-int FuelCellSerial::open_serial_port()
+int PcuSerial::open_serial_port()
 {
 	_fd = ::open(_port, O_RDWR | O_NOCTTY | O_NONBLOCK);
 
@@ -99,44 +99,118 @@ int FuelCellSerial::open_serial_port()
 		PX4_ERR("baud %d ATTR", termios_state);
 	}
 
+	PX4_INFO("opened %s @ 115200", _port);
 	return PX4_OK;
 }
 
-int FuelCellSerial::parse_floats(const char *line, debug_array_s &msg)
-{
-	unsigned count = 0;
-	const char *ptr = line;
+/* ── Parse a complete CSV line and publish to uORB ────────────────────── */
 
-	while (*ptr != '\0' && count < debug_array_s::ARRAY_SIZE) {
-		char *end = nullptr;
-		float val = strtof(ptr, &end);
+void PcuSerial::parse_line()
+{
+	/* Line format: "FC:<f>,<f>,<f>,<f>,<f>,<f>,<f>,<f>,<f>,<f>,<f>,<f>,<f>,<f>,<f>,<f>,<u>\r\n"
+	 * At this point _line_buf is null-terminated and \r\n has been stripped. */
+
+	/* Verify "FC:" prefix */
+	if (strncmp(_line_buf, "FC:", 3) != 0) {
+		PX4_WARN("line missing FC: prefix");
+		perf_count(_comms_errors);
+		return;
+	}
+
+	perf_begin(_sample_perf);
+
+	/* Point past the "FC:" prefix */
+	char *ptr = _line_buf + 3;
+	char *end;
+	float fields[NUM_FIELDS - 1]; /* 16 floats */
+	unsigned op_state = 0;
+
+	/* Parse 16 float fields */
+	for (unsigned i = 0; i < NUM_FIELDS - 1; i++) {
+		fields[i] = strtof(ptr, &end);
 
 		if (end == ptr) {
-			/* no conversion performed, skip this character */
-			ptr++;
-			continue;
+			PX4_WARN("CSV parse error at field %u, got '%c'", i, *ptr);
+			perf_count(_comms_errors);
+			perf_end(_sample_perf);
+			return;
 		}
-
-		msg.data[count] = val;
-		count++;
 
 		ptr = end;
 
-		if (*ptr == ',') {
-			ptr++;
+		if (i < NUM_FIELDS - 2) {
+			/* Expect a comma separator between fields */
+			if (*ptr != ',') {
+				PX4_WARN("expected comma after field %u, got '%c'", i, *ptr);
+				perf_count(_comms_errors);
+				perf_end(_sample_perf);
+				return;
+			}
+
+			ptr++; /* skip comma */
 		}
 	}
 
-	return (int)count;
+	/* Expect comma before the last (uint) field */
+	if (*ptr != ',') {
+		PX4_WARN("expected comma before operation_state, got '%c'", *ptr);
+		perf_count(_comms_errors);
+		perf_end(_sample_perf);
+		return;
+	}
+
+	ptr++; /* skip comma */
+
+	/* Parse the uint field */
+	unsigned long val = strtoul(ptr, &end, 10);
+
+	if (end == ptr) {
+		PX4_WARN("CSV parse error at operation_state, got '%c'", *ptr);
+		perf_count(_comms_errors);
+		perf_end(_sample_perf);
+		return;
+	}
+
+	op_state = (unsigned)val;
+
+	/* Publish to uORB */
+	pcu_telemetry_s msg{};
+	msg.timestamp          = hrt_absolute_time();
+	msg.stack_voltage      = fields[0];
+	msg.load_current       = fields[1];
+	msg.power              = fields[2];
+	msg.energy             = fields[3];
+	msg.battery_voltage    = fields[4];
+	msg.battery_current    = fields[5];
+	msg.load_voltage       = fields[6];
+	msg.stack_temp_1       = fields[7];
+	msg.stack_temp_2       = fields[8];
+	msg.stack_temp_3       = fields[9];
+	msg.stack_temp_4       = fields[10];
+	msg.target_stack_temp  = fields[11];
+	msg.board_temp         = fields[12];
+	msg.h2_supply_pressure = fields[13];
+	msg.tank_pressure      = fields[14];
+	msg.fan_speed          = fields[15];
+	msg.operation_state    = (uint8_t)op_state;
+
+	_pcu_telemetry_pub.publish(msg);
+
+	perf_end(_sample_perf);
 }
 
-int FuelCellSerial::collect()
+/* ── Collect bytes from serial port and assemble lines ────────────────── */
+
+int PcuSerial::collect()
 {
-	char readbuf[128];
+	uint8_t readbuf[256];
 	int ret = ::read(_fd, readbuf, sizeof(readbuf));
 
 	if (ret < 0) {
-		perf_count(_comms_errors);
+		if (errno != EAGAIN) {
+			perf_count(_comms_errors);
+		}
+
 		return -EAGAIN;
 
 	} else if (ret == 0) {
@@ -144,38 +218,30 @@ int FuelCellSerial::collect()
 	}
 
 	for (int i = 0; i < ret; i++) {
-		char c = readbuf[i];
+		char c = (char)readbuf[i];
 
-		if (c == '\n' || c == '\r') {
-			if (_linebuf_index > 0) {
-				_linebuf[_linebuf_index] = '\0';
-
-				perf_begin(_sample_perf);
-
-				debug_array_s msg{};
-				msg.timestamp = hrt_absolute_time();
-				msg.id = 0;
-				strncpy(msg.name, "fuelcell", sizeof(msg.name));
-
-				int num_values = parse_floats(_linebuf, msg);
-
-				if (num_values > 0) {
-					_debug_array_pub.publish(msg);
-				}
-
-				perf_end(_sample_perf);
-
-				_linebuf_index = 0;
+		if (c == '\n') {
+			/* Strip trailing \r if present */
+			if (_line_pos > 0 && _line_buf[_line_pos - 1] == '\r') {
+				_line_pos--;
 			}
 
+			_line_buf[_line_pos] = '\0';
+
+			if (_line_pos > 0) {
+				parse_line();
+			}
+
+			_line_pos = 0;
+
 		} else {
-			if (_linebuf_index < LINE_BUFFER_SIZE - 1) {
-				_linebuf[_linebuf_index++] = c;
+			if (_line_pos < LINE_BUF_SIZE - 1) {
+				_line_buf[_line_pos++] = c;
 
 			} else {
-				/* overflow, discard line */
-				_linebuf_index = 0;
-				perf_count(_comms_errors);
+				/* Line too long, discard and reset */
+				PX4_WARN("line buffer overflow, discarding");
+				_line_pos = 0;
 			}
 		}
 	}
@@ -183,17 +249,17 @@ int FuelCellSerial::collect()
 	return PX4_OK;
 }
 
-void FuelCellSerial::start()
+void PcuSerial::start()
 {
 	ScheduleOnInterval(10000); /* 100 Hz */
 }
 
-void FuelCellSerial::stop()
+void PcuSerial::stop()
 {
 	ScheduleClear();
 }
 
-void FuelCellSerial::Run()
+void PcuSerial::Run()
 {
 	if (_fd < 0) {
 		if (open_serial_port() != PX4_OK) {
@@ -204,7 +270,7 @@ void FuelCellSerial::Run()
 	collect();
 }
 
-void FuelCellSerial::print_info()
+void PcuSerial::print_info()
 {
 	perf_print_counter(_sample_perf);
 	perf_print_counter(_comms_errors);

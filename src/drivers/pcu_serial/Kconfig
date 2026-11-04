@@ -1,0 +1,5 @@
+menuconfig DRIVERS_PCU_SERIAL
+	bool "pcu_serial"
+	default n
+	---help---
+		Enable support for PCU (Power Control Unit) serial telemetry driver
