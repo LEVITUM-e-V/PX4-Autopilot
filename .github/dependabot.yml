@@ -1,0 +1,15 @@
+# Keeps the PX4-gazebo-models submodule (Tools/simulation/gz) up to date.
+# Dependabot opens a pull request against levitum-dev whenever branch `levitum` of
+# LEVITUM-e-V/PX4-gazebo-models (set as `branch` in .gitmodules) has a new commit.
+# The fork has many other submodules; only the gazebo models one is allowed here.
+version: 2
+updates:
+  - package-ecosystem: "gitsubmodule"
+    directory: "/"
+    target-branch: "levitum-dev"
+    schedule:
+      interval: "weekly"
+    allow:
+      - dependency-name: "Tools/simulation/gz"
+    commit-message:
+      prefix: "gz models"
