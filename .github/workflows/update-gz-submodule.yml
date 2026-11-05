@@ -1,0 +1,80 @@
+# Why this workflow exists
+# ------------------------
+# The simulator models come from the submodule Tools/simulation/gz (repository
+# LEVITUM-e-V/PX4-gazebo-models, branch `levitum`). A submodule stores one exact commit, so
+# a checkout of this fork always uses the models of that commit and simulation runs stay
+# comparable. The pin on `levitum-dev` and `levitum-next` must still follow the models
+# branch, otherwise nobody gets model fixes. This workflow moves the pin to the head of
+# `levitum` on both branches, with a commit directly on the branch (no pull request, so no
+# CI run of this fork's upstream test suite).
+#
+# When it runs
+# ------------
+# - `repository_dispatch` (gz-models-updated): sent by the workflow notify-fork.yml of
+#   PX4-gazebo-models on every push to its branch `levitum`. That needs the secret
+#   FORK_DISPATCH_TOKEN in the models repository: a fine-grained personal access token
+#   (owner LEVITUM-e-V, repository PX4-Autopilot only, permission Contents: read and write).
+#   Without the secret the notification is skipped and the hourly run below does the job.
+# - `schedule`: hourly fallback. It only reads the public models repository (git ls-remote),
+#   so it needs no secret. GitHub switches scheduled workflows off after 60 days without
+#   any activity in the repository; re-enable it in the Actions tab if that happens.
+# - `workflow_dispatch`: start it by hand from the Actions tab.
+# Workflows triggered by these events run from the default branch (main), which is why this
+# file lives there although it changes other branches.
+#
+# How it works
+# ------------
+# It reads the head of the models branch, compares it with the pin of each branch and, if
+# they differ, rewrites only the submodule entry (git update-index, no submodule checkout)
+# and pushes one commit. Pushes made with the workflow token do not start other workflows.
+# To keep a branch on an older models commit for a while, remove it from the matrix below.
+# To test newer models without changing the pin, point the simulation scripts at a checkout
+# of the models (MODELS_DIR in LEVITUM-e-V/PX4_Tools, folder sim_docker).
+name: Update gz models submodule
+
+on:
+  repository_dispatch:
+    types: [gz-models-updated]
+  schedule:
+    - cron: '23 * * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: update-gz-submodule
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        branch: [levitum-dev, levitum-next]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.branch }}
+          submodules: false
+
+      - name: Move the pin to the head of the models branch
+        env:
+          MODELS_URL: https://github.com/LEVITUM-e-V/PX4-gazebo-models.git
+          MODELS_BRANCH: levitum
+          SUBMODULE: Tools/simulation/gz
+          TARGET_BRANCH: ${{ matrix.branch }}
+        run: |
+          head=$(git ls-remote "$MODELS_URL" "refs/heads/$MODELS_BRANCH" | cut -f1)
+          test -n "$head"
+          current=$(git ls-tree HEAD "$SUBMODULE" | awk '{print $3}')
+          if [ "$current" = "$head" ]; then
+            echo "$TARGET_BRANCH already pins ${head:0:7}"
+            exit 0
+          fi
+          git update-index --add --cacheinfo "160000,$head,$SUBMODULE"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Update gz models submodule to PX4-gazebo-models $MODELS_BRANCH ${head:0:7}"
+          git push origin "HEAD:$TARGET_BRANCH"
