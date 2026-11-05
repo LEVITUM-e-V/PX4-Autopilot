@@ -1,4 +1,8 @@
 #!/bin/sh
+# Parameter ownership (see OWNERSHIP.md): this file should hold only what exists in the simulation and not on the aircraft
+# (SIM_GZ_* servo wiring, simulated sensors, model, world). New tuning, control allocation and transition/quadchute values go
+# to the parameter files in LEVITUM-e-V/PX4_Parameters. Values below that predate this rule are listed in
+# airframe_param_classification.md and are to be moved there.
 #
 # @name LEVITUM P5
 #
@@ -65,10 +69,10 @@ param set-default SIM_GZ_EC_MIN6 10
 param set-default SIM_GZ_EC_FUNC7 107
 param set-default SIM_GZ_EC_MIN7 0
 
-param set-default SIM_GZ_SV_FUNC1 201
-param set-default SIM_GZ_SV_FUNC2 202
-param set-default SIM_GZ_SV_FUNC3 203
-param set-default SIM_GZ_SV_FUNC4 204
+param set-default SIM_GZ_SV_FUNC1 203
+param set-default SIM_GZ_SV_FUNC2 204
+param set-default SIM_GZ_SV_FUNC3 201
+param set-default SIM_GZ_SV_FUNC4 202
 
 param set-default SIM_GZ_SV_REV 3
 
