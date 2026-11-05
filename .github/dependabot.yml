@@ -1,0 +1,38 @@
+# Optional second mechanism next to .github/workflows/update-gz-submodule.yml
+# ----------------------------------------------------------------------------
+# That workflow already moves the pin of the gazebo models submodule (Tools/simulation/gz,
+# repository LEVITUM-e-V/PX4-gazebo-models, branch `levitum`) on levitum-dev and levitum-next
+# without a pull request. This file lets Dependabot do the same by pull request, so a bump can
+# be reviewed and so a missed workflow run is caught. If the workflow keeps both pins current,
+# Dependabot finds nothing to do.
+#
+# - Dependabot reads this file from the default branch (levitum-next); `target-branch` sends
+#   the update pull requests to each branch listed below.
+# - `allow` limits it to the gazebo models. This fork has 23 submodules (NuttX, mavlink,
+#   libuavcan, ...); without the limit Dependabot would open a pull request for each of them,
+#   and every pull request in this fork starts the 89 inherited upstream CI jobs.
+# - `open-pull-requests-limit` keeps the damage small if the limit above does not work.
+# - To check it: Insights > Dependency graph > Dependabot must accept this file and list only
+#   Tools/simulation/gz. If it opens pull requests for other submodules, delete this file.
+version: 2
+updates:
+  - package-ecosystem: "gitsubmodule"
+    directory: "/"
+    target-branch: "levitum-next"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 1
+    allow:
+      - dependency-name: "Tools/simulation/gz"
+    commit-message:
+      prefix: "gz models"
+  - package-ecosystem: "gitsubmodule"
+    directory: "/"
+    target-branch: "levitum-dev"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 1
+    allow:
+      - dependency-name: "Tools/simulation/gz"
+    commit-message:
+      prefix: "gz models"
